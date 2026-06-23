@@ -57,6 +57,18 @@ export class GitProgressTrackerSettingTab extends PluginSettingTab {
                 }));
 
         new Setting(containerEl)
+            .setName('Minimum word similarity for revision')
+            .setDesc('Jaccard index (0–1). Deleted and new lines are counted as a revision only if they reach this degree of similarity. 0 = always pair; 1 = only with identical sets of words.')
+            .addSlider(slider => slider
+                .setLimits(0, 1, 0.05)
+                .setValue(this.plugin.settings.revisionSimilarityThreshold)
+                .setDynamicTooltip()
+                .onChange(async (value) => {
+                    this.plugin.settings.revisionSimilarityThreshold = value;
+                    await this.plugin.saveSettings();
+                }));
+
+        new Setting(containerEl)
             .setName('Max. context lines for revision')
             .setDesc('How many lines of context are permitted between a deletion and an insertion for it to still count as a revision.')
             .addSlider(slider => slider

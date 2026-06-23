@@ -1,5 +1,53 @@
 [
   {
+    "hash": "1c55f7e81b7dfdfc87750deeed0bb156d2f0478b",
+    "timestamp": 1782242963,
+    "message": "Noch eine Zeile",
+    "files": {
+      "__global__": {
+        "additions": 1,
+        "deletions": 0,
+        "revisions": 0,
+        "wordsAdded": 2,
+        "wordsDeleted": 0,
+        "revisionWords": 0,
+        "revisionNetWords": 0
+      }
+    }
+  },
+  {
+    "hash": "d7135da9430f4ffa8acb891c569020727dec4c3b",
+    "timestamp": 1782242876,
+    "message": "Noch eine Zeile.",
+    "files": {
+      "__global__": {
+        "additions": 1,
+        "deletions": 0,
+        "revisions": 0,
+        "wordsAdded": 3,
+        "wordsDeleted": 0,
+        "revisionWords": 0,
+        "revisionNetWords": 0
+      }
+    }
+  },
+  {
+    "hash": "349572117a4c1b3c6de62ab9bf526ab22dc6e310",
+    "timestamp": 1782241435,
+    "message": "Neue Zeile mit 2 Worten",
+    "files": {
+      "__global__": {
+        "additions": 1,
+        "deletions": 0,
+        "revisions": 0,
+        "wordsAdded": 2,
+        "wordsDeleted": 0,
+        "revisionWords": 0,
+        "revisionNetWords": 0
+      }
+    }
+  },
+  {
     "hash": "d132f08d59a7965bbcf892d3e68cb01cc10a94e0",
     "timestamp": 1782235068,
     "message": "1 Wort geändert, 1 Wort gelöscht",

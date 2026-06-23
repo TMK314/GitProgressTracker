@@ -44,7 +44,8 @@ export interface GitProgressTrackerSettings {
         deletion: number;
         revision: number;
     };
-    dailyGoal: number;                // NEU
+    dailyGoal: number;
+    revisionSimilarityThreshold: number;
 }
 
 export const DEFAULT_SETTINGS: GitProgressTrackerSettings = {
@@ -54,5 +55,6 @@ export const DEFAULT_SETTINGS: GitProgressTrackerSettings = {
     wordSeparatorRegex: '[\\s\\-–—.,;:!?»«“”\'\"\\[\\]\\(\\)]+',
     maxRevisionDistance: 0,
     writingIndexWeights: { addition: 1, deletion: 0.5, revision: 1.2 },
-    dailyGoal: 500                    // NEU
+    dailyGoal: 500,
+    revisionSimilarityThreshold: 0.5,
 };

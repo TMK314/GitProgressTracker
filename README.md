@@ -1,92 +1,105 @@
-# Obsidian Sample Plugin
+# Git Progress Tracker – Git-based Progress Tracking for Your Writing Projects
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+Track your writing progress across all phases of your project – from the first draft to final revisions. Unlike simple word‑count trackers, **Git Progress Tracker** analyses your Git commits to distinguish between *new writing*, *deletions*, and *revisions*, giving you a realistic picture of the work you’ve actually done.
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+---
+## Features
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
+- **True revision detection** – By comparing word‑frequency changes in each commit, Git Progress Tracker knows when you’re rewriting existing text rather than just adding or removing words.
+- **Levenshtein‑based word‑level diff** – Revisions are measured precisely: replacing one word with another counts as *one* change, not two.
+- **Rich progress metrics**
+  - Net word difference
+  - Gross work volume (all words touched)
+  - Pure revision effort
+- **Git‑Hub–style heatmap** – A clean, scrollable heatmap shows your daily progress over the project’s lifetime. Hover to see exact scores.
+- **Three views**
+  1. **Overview** – Heatmap + aggregated totals
+  2. **By Commit** – Per‑commit breakdown
+  3. **By Day** – Daily summaries, sorted chronologically
+- **Customisable weighting** – Assign different weights to new words, deleted words, and revised words to match your personal definition of “progress”.
+- **Automatic daily goal tracking** – Set a target for your weighted progress; the heatmap colours show how close you came each day.
+- **Flexible file filtering** – Include only the files you care about (e.g. `**/*.md`) using glob patterns.
+- **Author filter** – Count only your own commits in shared repositories.
+- **Dark & Light mode** – Colours adapt automatically to Obsidian’s theme.
 
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open modal (simple)" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and outputs a Notice on click.
-- Registers a global interval which logs 'setInterval' to the console.
+---
 
-## First time developing plugins?
+## Requirements
 
-Quick starting guide for new plugin devs:
+- Your Obsidian vault must be a **Git repository** (or a subfolder of one).  
+  The plugin does not manage Git itself – use your favourite Git client (CLI, GitHub Desktop, etc.).
+- Git must be installed and available in your PATH.
+- It is recommended to write each sentence on a separate line so that the plugin can work effectively.
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `src/main.ts` to `main.js`.
-- Make changes to `src/main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+---
 
-## Releasing new releases
+## Installation
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+### From Obsidian Community Plugins (coming soon)
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+1. Open **Settings → Community Plugins**.
+2. Disable **Safe mode** if necessary.
+3. Click **Browse** and search for “Federstrich”.
+4. Install and enable the plugin.
 
-## Adding your plugin to the community plugin list
+### Manual installation
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+1. Download the latest release from [GitHub Releases](#) (link to be added).
+2. Extract the folder into `<vault>/.obsidian/plugins/federstrich/`.
+3. Reload Obsidian.
+4. Enable the plugin under **Settings → Community Plugins → Installed Plugins**.
 
-## How to use
+---
 
-- Clone this repo.
-- Make sure your NodeJS is at least v18 (`node --version`).
-- `npm i` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+## Getting Started
 
-## Manually installing the plugin
+1. **Enable the plugin** and open the settings to configure your preferences.
+2. Click the **feather icon** in the ribbon (or use the command “Git Progress Tracker: Update Progress”) to analyse your Git history.
+3. Open the **Progress View** via the ribbon icon or the command palette.
+4. Explore the three tabs:
+   - **Overview** – Heatmap and total statistics.
+   - **By Commit** – See what changed in each commit.
+   - **By Day** – Daily aggregated numbers.
+5. Use the **“Rotate view”** button to swap the axes of the heatmap.
+6. Adjust the **weighting** and **daily goal** in the settings until the progress numbers feel right to you.
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+---
 
-## Improve code quality with eslint
+## Settings
 
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code.
-- This project already has eslint preconfigured, you can invoke a check by running`npm run lint`
-- Together with a custom eslint [plugin](https://github.com/obsidianmd/eslint-plugin) for Obsidan specific code guidelines.
-- A GitHub action is preconfigured to automatically lint every commit on all branches.
+| Setting | Description | Default |
+|--------|-------------|---------|
+| Repository path | Relative path inside the vault where your Git repository lives. Leave empty for the vault root. | *(empty)* |
+| Author filter | Only analyse commits by this Git author (leave blank for all). | *(empty)* |
+| Include files (glob) | Glob pattern for files to analyse. | `**/*.md` |
+| Word separator (regex) | Regular expression used to split words. | `[\s\-–—.,;:!?»«“”'"\[\]()]+` |
+| Max context lines for revision | How many unchanged lines may appear between a deletion and an addition for them to still be considered a revision. | 0 |
+| Weight: New words | Weight for added words. | 1.0 |
+| Weight: Deleted words | Weight for deleted words. | 0.5 |
+| Weight: Revised words | Weight for words changed during revision. | 1.2 |
+| Daily goal | Target points per day (based on the weighted values). | 500 |
 
-## Funding URL
+---
 
-You can include funding URLs where people who use your plugin can financially support it.
+## Metrics explained
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+| Metric | Formula / Meaning |
+|--------|------------------|
+| **Net word difference** | `wordsAdded − wordsDeleted + revisionNetWords` – The net effect on your manuscript’s size. |
+| **Gross work volume** | `wordsAdded + wordsDeleted + revisionWords` – Every word you touched. |
+| **Pure revision effort** | `revisionWords` – Words that were both removed and added in revisions. |
+| **New words** | Words added without any corresponding deletion. |
+| **Deleted words** | Words removed without replacement. |
+| **Revision net change** | `revisionNewWords − revisionOldWords` – Net change caused by revisions. |
 
-```json
-{
-	"fundingUrl": "https://buymeacoffee.com"
-}
-```
+---
 
-If you have multiple URLs, you can also do:
+## How revision detection works
 
-```json
-{
-	"fundingUrl": {
-		"Buy Me a Coffee": "https://buymeacoffee.com",
-		"GitHub Sponsor": "https://github.com/sponsors",
-		"Patreon": "https://www.patreon.com/"
-	}
-}
-```
+1. Git Progress Tracker pulls the unified diff for each commit.
+2. Within each file, consecutive blocks of deleted (`-`) and added (`+`) lines that are not separated by context lines are paired as **revisions**.
+3. For each revision block, the plugin tokenises the old and new lines into words.
+4. It then calculates the **Levenshtein distance** on the word level, treating word substitution as a single change.
+5. The result is stored as `revisionWords` (the number of individual word changes) and `revisionNetWords` (the net difference in word count).
 
-## API Documentation
-
-See https://docs.obsidian.md
+This means that if you change *three words in a 19‑word sentence*, the plugin counts **three** revisions, not 38.

@@ -1,5 +1,5 @@
 import { Plugin, Notice, WorkspaceLeaf } from 'obsidian';
-import type { GitProgressTrackerSettings, CommitMetrics, AggregatedMetrics } from './types';
+import type { GitProgressTrackerSettings, CommitMetrics, AggregatedMetrics, DiffBlock } from './types';
 import { DEFAULT_SETTINGS } from './types';
 import { GitProgressTrackerSettingTab } from './settings';
 import { GitAnalyzer } from './GitAnalyzer';
@@ -90,6 +90,78 @@ export default class GitProgressTrackerPlugin extends Plugin {
                 try {
                     const diff = await this.gitAnalyzer.getDiff(commit.hash);
                     const blocks = diffParser.parse(diff);
+                    const threshold = this.settings.revisionSimilarityThreshold;
+                    const wordCounter = new WordCounter(this.settings.wordSeparatorRegex);
+                    const refinedBlocks: DiffBlock[] = [];
+
+                    for (const block of blocks) {
+                        if (block.type !== 'revision') {
+                            refinedBlocks.push(block);
+                            continue;
+                        }
+
+                        // 1. Exakt identische Zeilen entfernen (z. B. wegen fehlender Newline am Dateiende)
+                        let oldLines = [...block.oldLines];
+                        let newLines = [...block.newLines];
+
+                        for (let i = oldLines.length - 1; i >= 0; i--) {
+                            if (oldLines[i] === undefined) continue;
+                            const idx = newLines.indexOf(oldLines[i]!);
+                            if (idx !== -1) {
+                                oldLines.splice(i, 1);
+                                newLines.splice(idx, 1);
+                            }
+                        }
+
+                        // 2. Wenn nach der Bereinigung kein Unterschied bleibt → ignorieren
+                        if (oldLines.length === 0 && newLines.length === 0) continue;
+
+                        // 3. Wenn nur noch eine Seite übrig ist → reine Löschung oder Addition
+                        if (oldLines.length === 0) {
+                            refinedBlocks.push({ type: 'addition', oldLines: [], newLines });
+                            continue;
+                        }
+                        if (newLines.length === 0) {
+                            refinedBlocks.push({ type: 'deletion', oldLines, newLines: [] });
+                            continue;
+                        }
+
+                        // 4. Wortähnlichkeitsprüfung auf den bereinigten Zeilen
+                        const oldTokens = wordCounter.tokenizeLines(oldLines);
+                        const newTokens = wordCounter.tokenizeLines(newLines);
+
+                        const [shorterTokens, longerTokens] = oldTokens.length <= newTokens.length
+                            ? [oldTokens, newTokens]
+                            : [newTokens, oldTokens];
+
+                        const freq = new Map<string, number>();
+                        for (const w of longerTokens) freq.set(w, (freq.get(w) || 0) + 1);
+
+                        let covered = 0;
+                        for (const w of shorterTokens) {
+                            const available = freq.get(w) || 0;
+                            if (available > 0) {
+                                covered++;
+                                freq.set(w, available - 1);
+                            }
+                        }
+
+                        const coverage = covered / shorterTokens.length;
+
+                        if (coverage >= threshold) {
+                            // echte Revision mit den bereinigten Zeilen
+                            refinedBlocks.push({ type: 'revision', oldLines, newLines });
+                        } else {
+                            // getrennt als Löschung und Addition behandeln
+                            if (oldLines.length > 0) {
+                                refinedBlocks.push({ type: 'deletion', oldLines, newLines: [] });
+                            }
+                            if (newLines.length > 0) {
+                                refinedBlocks.push({ type: 'addition', oldLines: [], newLines });
+                            }
+                        }
+                    }
+
                     const metrics: CommitMetrics = {
                         hash: commit.hash,
                         timestamp: commit.timestamp,
@@ -101,7 +173,7 @@ export default class GitProgressTrackerPlugin extends Plugin {
                     let wordsAdded = 0, wordsDeleted = 0;
                     let revisionWords = 0, revisionNetWords = 0;
 
-                    for (const block of blocks) {
+                    for (const block of refinedBlocks) {
                         switch (block.type) {
                             case 'addition':
                                 additions += block.newLines.length;
