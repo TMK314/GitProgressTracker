@@ -6,8 +6,9 @@ export class WordCounter {
     }
 
     countWords(text: string): number {
-        if (!text.trim()) return 0;
-        const words = text.trim().split(this.separator).filter(w => w.length > 0);
+        const cleanText = this.sanitizeMarkdownLinks(text);
+        if (!cleanText.trim()) return 0;
+        const words = cleanText.trim().split(this.separator).filter(w => w.length > 0);
         return words.length;
     }
 
@@ -15,16 +16,29 @@ export class WordCounter {
         return lines.reduce((sum, line) => sum + this.countWords(line), 0);
     }
 
-    /**
-     * Zerlegt eine Liste von Zeilen in ein flaches Array von Wörtern.
-     */
     tokenizeLines(lines: string[]): string[] {
         const words: string[] = [];
         for (const line of lines) {
-            if (!line.trim()) continue;
-            const tokens = line.trim().split(this.separator).filter(w => w.length > 0);
+            const cleanLine = this.sanitizeMarkdownLinks(line);
+            if (!cleanLine.trim()) continue;
+            const tokens = cleanLine.trim().split(this.separator).filter(w => w.length > 0);
             words.push(...tokens);
         }
         return words;
+    }
+
+    /**
+     * Ersetzt Markdown-Links durch ihren reinen Textinhalt.
+     * - Wikilinks: [[target|alias]] → alias (oder target, wenn kein alias)
+     * - Normale Links: [text](url) → text
+     */
+    private sanitizeMarkdownLinks(text: string): string {
+        // Wikilinks mit Alias: [[target|alias]] → alias
+        text = text.replace(/\[\[[^\]|]+\|([^\]]+)\]\]/g, '$1');
+        // Wikilinks ohne Alias: [[target]] → target
+        text = text.replace(/\[\[([^\]]+)\]\]/g, '$1');
+        // Normale Links: [text](url) → text
+        text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+        return text;
     }
 }

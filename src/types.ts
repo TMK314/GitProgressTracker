@@ -7,16 +7,16 @@ export interface DiffBlock {
 export interface FileMetrics {
     additions: number;
     deletions: number;
-    revisions: number;          // Anzahl der Revisionsblöcke
+    revisions: number;
     wordsAdded: number;
     wordsDeleted: number;
-    revisionWords: number;      // Bearbeitete Wörter (Häufigkeitsvergleich)
-    revisionNetWords: number;   // Netto-Wortänderung durch Revisionen
+    revisionWords: number;
+    revisionNetWords: number;
 }
 
 export interface CommitMetrics {
     hash: string;
-    timestamp: number;          // Unix seconds
+    timestamp: number;
     message: string;
     files: {
         [filePath: string]: FileMetrics;
@@ -26,11 +26,11 @@ export interface CommitMetrics {
 export interface AggregatedMetrics {
     totalWordsAdded: number;
     totalWordsDeleted: number;
-    totalRevisionWords: number;      // Summe der bearbeiteten Wörter
-    totalRevisionNetWords: number;   // Summe der Netto-Änderungen durch Revisionen
-    netWords: number;                // totalWordsAdded - totalWordsDeleted + totalRevisionNetWords
-    grossWork: number;               // totalWordsAdded + totalWordsDeleted + totalRevisionWords
-    pureRevision: number;            // = totalRevisionWords
+    totalRevisionWords: number;
+    totalRevisionNetWords: number;
+    netWords: number;
+    grossWork: number;
+    pureRevision: number;
 }
 
 export interface FederstrichSettings {
@@ -44,6 +44,7 @@ export interface FederstrichSettings {
         deletion: number;
         revision: number;
     };
+    dailyGoal: number;                // NEU
 }
 
 export const DEFAULT_SETTINGS: FederstrichSettings = {
@@ -52,5 +53,6 @@ export const DEFAULT_SETTINGS: FederstrichSettings = {
     includePattern: '**/*.md',
     wordSeparatorRegex: '[\\s\\-–—.,;:!?»«“”\'\"\\[\\]\\(\\)]+',
     maxRevisionDistance: 0,
-    writingIndexWeights: { addition: 1, deletion: 0.5, revision: 1.2 }
+    writingIndexWeights: { addition: 1, deletion: 0.5, revision: 1.2 },
+    dailyGoal: 500                    // NEU
 };

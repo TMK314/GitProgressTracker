@@ -1,6 +1,5 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
 import type FederstrichPlugin from './main';
-import { DEFAULT_SETTINGS } from './types';
 
 export class FederstrichSettingTab extends PluginSettingTab {
     plugin: FederstrichPlugin;
@@ -66,6 +65,55 @@ export class FederstrichSettingTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     this.plugin.settings.maxRevisionDistance = value;
                     await this.plugin.saveSettings();
+                }));
+
+        // Gewichtungen
+        containerEl.createEl('h3', { text: 'Gewichtungen für Fortschrittsindex' });
+
+        new Setting(containerEl)
+            .setName('Gewichtung: Neue Wörter')
+            .addSlider(slider => slider
+                .setLimits(0, 2, 0.1)
+                .setValue(this.plugin.settings.writingIndexWeights.addition)
+                .setDynamicTooltip()
+                .onChange(async (value) => {
+                    this.plugin.settings.writingIndexWeights.addition = value;
+                    await this.plugin.saveSettings();
+                }));
+
+        new Setting(containerEl)
+            .setName('Gewichtung: Gelöschte Wörter')
+            .addSlider(slider => slider
+                .setLimits(0, 2, 0.1)
+                .setValue(this.plugin.settings.writingIndexWeights.deletion)
+                .setDynamicTooltip()
+                .onChange(async (value) => {
+                    this.plugin.settings.writingIndexWeights.deletion = value;
+                    await this.plugin.saveSettings();
+                }));
+
+        new Setting(containerEl)
+            .setName('Gewichtung: Überarbeitete Wörter')
+            .addSlider(slider => slider
+                .setLimits(0, 2, 0.1)
+                .setValue(this.plugin.settings.writingIndexWeights.revision)
+                .setDynamicTooltip()
+                .onChange(async (value) => {
+                    this.plugin.settings.writingIndexWeights.revision = value;
+                    await this.plugin.saveSettings();
+                }));
+
+        new Setting(containerEl)
+            .setName('Tägliches Ziel (gewichtete Einheiten)')
+            .setDesc('Ziel für den gewichteten Fortschrittsindex pro Tag (z. B. 500).')
+            .addText(text => text
+                .setValue(this.plugin.settings.dailyGoal.toString())
+                .onChange(async (value) => {
+                    const num = parseFloat(value);
+                    if (!isNaN(num) && num > 0) {
+                        this.plugin.settings.dailyGoal = num;
+                        await this.plugin.saveSettings();
+                    }
                 }));
     }
 }

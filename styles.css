@@ -20,3 +20,113 @@
 .commit-msg {
     color: var(--text-normal);
 }
+
+.federstrich-tabs {
+    margin-bottom: 10px;
+}
+.federstrich-tab-btn {
+    margin-right: 5px;
+    padding: 4px 10px;
+    cursor: pointer;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+}
+.federstrich-tab-btn.active {
+    background: var(--interactive-accent);
+    color: white;
+}
+.commit-hash {
+    font-family: monospace;
+    color: var(--text-muted);
+}
+.commit-msg {
+    color: var(--text-normal);
+}
+
+.federstrich-tabs {
+    margin-bottom: 10px;
+}
+.federstrich-tab-btn {
+    margin-right: 5px;
+    padding: 4px 10px;
+    cursor: pointer;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+}
+.federstrich-tab-btn.active {
+    background: var(--interactive-accent);
+    color: white;
+}
+.commit-hash {
+    font-family: monospace;
+    color: var(--text-muted);
+}
+.commit-msg {
+    color: var(--text-normal);
+}
+
+.federstrich-tabs {
+    margin-bottom: 10px;
+}
+.federstrich-tab-btn {
+    margin-right: 5px;
+    padding: 4px 10px;
+    cursor: pointer;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+}
+.federstrich-tab-btn.active {
+    background: var(--interactive-accent);
+    color: white;
+}
+.commit-hash {
+    font-family: monospace;
+    color: var(--text-muted);
+}
+.commit-msg {
+    color: var(--text-normal);
+}
+
+
+
+.federstrich-heatmap {
+    margin-bottom: 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.heatmap-table {
+    border-collapse: collapse;
+    font-size: 10px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.heatmap-month-header,
+.heatmap-day-header,
+.heatmap-month-cell,
+.heatmap-day-label {
+    text-align: center;
+    padding: 2px 4px;
+    font-weight: bold;
+    color: var(--text-muted);
+}
+
+.heatmap-cell {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: none;
+    margin: 3px;
+    position: relative;
+}
+
+.heatmap-cell.empty {
+    background: transparent;
+}
+
+.theme-light .heatmap-cell.empty { background: #ebedf0; }
+.theme-dark .heatmap-cell.empty { background: #2d333b; }

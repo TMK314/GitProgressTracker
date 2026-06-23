@@ -1,5 +1,21 @@
 [
   {
+    "hash": "d132f08d59a7965bbcf892d3e68cb01cc10a94e0",
+    "timestamp": 1782235068,
+    "message": "1 Wort geändert, 1 Wort gelöscht",
+    "files": {
+      "__global__": {
+        "additions": 0,
+        "deletions": 0,
+        "revisions": 1,
+        "wordsAdded": 0,
+        "wordsDeleted": 0,
+        "revisionWords": 2,
+        "revisionNetWords": -1
+      }
+    }
+  },
+  {
     "hash": "69fdc3de94cfba7cfc424b3501f09e78b7af750f",
     "timestamp": 1782227046,
     "message": "Willkommen - 1 Wort geändert, 1 Wort gelöscht.",
@@ -56,7 +72,7 @@
         "additions": 5,
         "deletions": 0,
         "revisions": 0,
-        "wordsAdded": 43,
+        "wordsAdded": 38,
         "wordsDeleted": 0,
         "revisionWords": 0,
         "revisionNetWords": 0

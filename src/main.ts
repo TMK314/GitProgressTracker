@@ -21,6 +21,8 @@ export default class FederstrichPlugin extends Plugin {
         this.metricsStore = new MetricsStore(this.app.vault, this.manifest.dir!);
         await this.metricsStore.load();
 
+        this.computeAggregatedMetrics();
+
         this.gitAnalyzer = new GitAnalyzer(vaultRoot, this.settings);
 
         this.addSettingTab(new FederstrichSettingTab(this.app, this));
