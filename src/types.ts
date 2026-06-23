@@ -33,7 +33,7 @@ export interface AggregatedMetrics {
     pureRevision: number;
 }
 
-export interface FederstrichSettings {
+export interface GitProgressTrackerSettings {
     repoPath: string;
     authorFilter: string;
     includePattern: string;
@@ -47,7 +47,7 @@ export interface FederstrichSettings {
     dailyGoal: number;                // NEU
 }
 
-export const DEFAULT_SETTINGS: FederstrichSettings = {
+export const DEFAULT_SETTINGS: GitProgressTrackerSettings = {
     repoPath: '',
     authorFilter: '',
     includePattern: '**/*.md',

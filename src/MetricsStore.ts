@@ -10,7 +10,7 @@ export class MetricsStore {
     constructor(vault: Vault, pluginDir: string) {
         this.vault = vault;
         this.pluginDir = pluginDir;
-        this.cachePath = `${pluginDir}/federstrich-metrics.json`;
+        this.cachePath = `${pluginDir}/GitProgressTracker-metrics.json`;
     }
 
     async load(): Promise<void> {
@@ -24,8 +24,8 @@ export class MetricsStore {
                 }
             }
         } catch (e) {
-            console.error('Federstrich: Failed to load metrics', e);
-            new Notice('Federstrich: Fehler beim Laden der Metriken.');
+            console.error('GitProgressTracker: Failed to load metrics', e);
+            new Notice('GitProgressTracker: Fehler beim Laden der Metriken.');
         }
     }
 

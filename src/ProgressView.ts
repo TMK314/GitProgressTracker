@@ -1,22 +1,29 @@
 import { ItemView, WorkspaceLeaf } from 'obsidian';
-import type FederstrichPlugin from './main';
+import type GitProgressTrackerPlugin from './main';
 import type { AggregatedMetrics } from './types';
 
-export const VIEW_TYPE_FEDERSTRICH = 'federstrich-progress-view';
+export const VIEW_TYPE_GitProgressTracker = 'GitProgressTracker-progress-view';
 
 export class ProgressView extends ItemView {
-    plugin: FederstrichPlugin;
+    plugin: GitProgressTrackerPlugin;
     private activeTab: 'overview' | 'commits' | 'daily' = 'overview';
     private heatmapRotated: boolean = false;
+    private heatmapDiv: HTMLElement | null = null;
 
-    constructor(leaf: WorkspaceLeaf, plugin: FederstrichPlugin) {
+    constructor(leaf: WorkspaceLeaf, plugin: GitProgressTrackerPlugin) {
         super(leaf);
         this.plugin = plugin;
     }
 
-    getViewType(): string { return VIEW_TYPE_FEDERSTRICH; }
-    getDisplayText(): string { return 'Federstrich Fortschritt'; }
+    getViewType(): string { return VIEW_TYPE_GitProgressTracker; }
+    getDisplayText(): string { return 'GitProgressTracker Fortschritt'; }
     getIcon(): string { return 'feather'; }
+    onResize() {
+        super.onResize();
+        if (this.activeTab === 'overview' && this.heatmapDiv) {
+            this.heatmapDiv.scrollLeft = this.heatmapDiv.scrollWidth;
+        }
+    }
 
     async onOpen(): Promise<void> { this.render(); }
 
@@ -25,12 +32,12 @@ export class ProgressView extends ItemView {
         if (!contentEl) return;
         contentEl.empty();
 
-        const tabBar = contentEl.createEl('div', { cls: 'federstrich-tabs' });
-        this.createTabButton(tabBar, 'Übersicht', 'overview');
-        this.createTabButton(tabBar, 'Nach Commit', 'commits');
-        this.createTabButton(tabBar, 'Nach Tag', 'daily');
+        const tabBar = contentEl.createEl('div', { cls: 'GitProgressTracker-tabs' });
+        this.createTabButton(tabBar, 'Overview', 'overview');
+        this.createTabButton(tabBar, 'Commits', 'commits');
+        this.createTabButton(tabBar, 'Daily', 'daily');
 
-        const tabContent = contentEl.createEl('div', { cls: 'federstrich-tab-content' });
+        const tabContent = contentEl.createEl('div', { cls: 'GitProgressTracker-tab-content' });
         switch (this.activeTab) {
             case 'overview': this.renderOverview(tabContent); break;
             case 'commits': this.renderCommits(tabContent); break;
@@ -39,14 +46,14 @@ export class ProgressView extends ItemView {
     }
 
     private createTabButton(parent: HTMLElement, label: string, tab: 'overview' | 'commits' | 'daily') {
-        const btn = parent.createEl('button', { text: label, cls: 'federstrich-tab-btn' });
+        const btn = parent.createEl('button', { text: label, cls: 'GitProgressTracker-tab-btn' });
         if (this.activeTab === tab) btn.addClass('active');
         btn.onclick = () => { this.activeTab = tab; this.render(); };
     }
 
     private renderOverview(container: HTMLElement) {
         const btnRow = container.createEl('div', { cls: 'heatmap-controls' });
-        const rotateBtn = btnRow.createEl('button', { text: 'Ansicht drehen', cls: 'federstrich-btn' });
+        const rotateBtn = btnRow.createEl('button', { text: 'Rotate View', cls: 'GitProgressTracker-btn' });
         rotateBtn.onclick = () => {
             this.heatmapRotated = !this.heatmapRotated;
             this.render();
@@ -56,18 +63,18 @@ export class ProgressView extends ItemView {
 
         const metrics = this.plugin.getLastAggregatedMetrics();
         if (!metrics) {
-            container.createEl('p', { text: 'Noch keine Analyse durchgeführt.' });
+            container.createEl('p', { text: 'No analysis performed yet.' });
             return;
         }
-        container.createEl('h4', { text: 'Gesamtstatistik' });
+        container.createEl('h4', { text: 'Total Statistics' });
         const table = container.createEl('table');
         const rows: [string, number][] = [
-            ['Netto-Wortdifferenz', metrics.netWords],
-            ['Brutto-Arbeitsvolumen', metrics.grossWork],
-            ['Reine Überarbeitung (bearbeitete Wörter)', metrics.pureRevision],
-            ['Neue Wörter (Additionen)', metrics.totalWordsAdded],
-            ['Gelöschte Wörter (Löschungen)', metrics.totalWordsDeleted],
-            ['Überarbeitung Netto-Änderung', metrics.totalRevisionNetWords]
+            ['Net word difference', metrics.netWords],
+            ['Gross volume of work', metrics.grossWork],
+            ['Pure revision (revised words)', metrics.pureRevision],
+            ['New words (additions)', metrics.totalWordsAdded],
+            ['Deleted words (deletions)', metrics.totalWordsDeleted],
+            ['Revised net change', metrics.totalRevisionNetWords]
         ];
         for (const [label, value] of rows) {
             const row = table.createEl('tr');
@@ -130,14 +137,13 @@ export class ProgressView extends ItemView {
             if (month !== lastMonth) {
                 monthHeaders.push({ label: week.startDate.toLocaleString('default', { month: 'short' }), colSpan: 1 });
             } else {
-                if (monthHeaders !== undefined)
-                    if (monthHeaders[monthHeaders.length - 1] !== undefined)
-                        monthHeaders[monthHeaders.length - 1]!.colSpan++;
+                monthHeaders[monthHeaders.length - 1]!.colSpan++; // garantiert vorhanden
             }
             lastMonth = month;
         }
 
-        const heatmapDiv = container.createEl('div', { cls: 'federstrich-heatmap' });
+        const heatmapDiv = container.createEl('div', { cls: 'GitProgressTracker-heatmap' });
+        this.heatmapDiv = heatmapDiv;
 
         if (!this.heatmapRotated) {
             const table = heatmapDiv.createEl('table', { cls: 'heatmap-table' });
@@ -179,8 +185,8 @@ export class ProgressView extends ItemView {
             const tbody = table.createEl('tbody');
 
             const headerRow = thead.createEl('tr');
-            headerRow.createEl('th', { text: 'KW', cls: 'heatmap-month-header' });
-            const dayNames = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+            headerRow.createEl('th', { text: 'Week', cls: 'heatmap-month-header' });
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             for (const d of dayNames) {
                 headerRow.createEl('th', { text: d, cls: 'heatmap-day-header' });
             }
@@ -188,7 +194,7 @@ export class ProgressView extends ItemView {
             for (const week of weeks) {
                 const row = tbody.createEl('tr');
                 const kw = this.getWeekNumber(week.startDate);
-                row.createEl('td', { text: `KW ${kw}`, cls: 'heatmap-month-cell' });
+                row.createEl('td', { text: `CW ${kw}`, cls: 'heatmap-month-cell' });
 
                 // Für jeden Wochentag Mo..So prüfen
                 for (const dayLabel of dayNames) {
@@ -209,6 +215,11 @@ export class ProgressView extends ItemView {
                 }
             }
         }
+
+        // Automatisch nach rechts scrollen (neueste Tage zuerst sichtbar)
+        requestAnimationFrame(() => {
+            heatmapDiv.scrollLeft = heatmapDiv.scrollWidth;
+        });
     }
 
     private getDailyWeightedScores(weights: { addition: number; deletion: number; revision: number }): Map<string, number> {
@@ -220,8 +231,8 @@ export class ProgressView extends ItemView {
             const date = new Date(cm.timestamp * 1000);
             const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             const score = global.wordsAdded * weights.addition
-                        + global.wordsDeleted * weights.deletion
-                        + global.revisionWords * weights.revision;
+                + global.wordsDeleted * weights.deletion
+                + global.revisionWords * weights.revision;
             const current = map.get(dateKey) || 0;
             map.set(dateKey, current + score);
         }
@@ -234,7 +245,7 @@ export class ProgressView extends ItemView {
 
     private getWeekNumber(d: Date): number {
         const date = new Date(d.getTime());
-        date.setHours(0,0,0,0);
+        date.setHours(0, 0, 0, 0);
         date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
         const week1 = new Date(date.getFullYear(), 0, 4);
         return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
@@ -261,18 +272,19 @@ export class ProgressView extends ItemView {
     private renderCommits(container: HTMLElement) {
         const allCommits = this.plugin.metricsStore.getAllMetrics();
         if (allCommits.length === 0) {
-            container.createEl('p', { text: 'Keine Commits analysiert.' });
+            container.createEl('p', { text: 'No commits analyzed.' });
             return;
         }
         container.createEl('h4', { text: 'Commits' });
-        const table = container.createEl('table');
+        const table = container.createEl('table', { cls: 'GitProgressTracker-data-table' });
         const header = table.createEl('tr');
-        header.createEl('th', { text: 'Datum' });
+        header.createEl('th', { text: 'Date' });
         header.createEl('th', { text: 'Commit' });
-        header.createEl('th', { text: '+ Wörter' });
-        header.createEl('th', { text: '- Wörter' });
-        header.createEl('th', { text: 'Überarb.' });
-        header.createEl('th', { text: 'Netto' });
+        header.createEl('th', { text: 'Message' });
+        header.createEl('th', { text: '+ Words' });
+        header.createEl('th', { text: '- Words' });
+        header.createEl('th', { text: 'Revisions' });
+        header.createEl('th', { text: 'Net' });
 
         for (const cm of allCommits) {
             const global = cm.files['__global__'];
@@ -281,9 +293,10 @@ export class ProgressView extends ItemView {
             const net = global.wordsAdded - global.wordsDeleted + global.revisionNetWords;
             const row = table.createEl('tr');
             row.createEl('td', { text: date });
-            const hashCell = row.createEl('td');
-            hashCell.createEl('span', { text: cm.hash.substring(0, 7), cls: 'commit-hash' });
-            hashCell.createEl('span', { text: ` ${cm.message}`, cls: 'commit-msg' });
+            row.createEl('td', { text: cm.hash.substring(0, 7), cls: 'commit-hash' });
+            const msgCell = row.createEl('td', { cls: 'commit-msg-cell' });
+            msgCell.setText(cm.message);
+            msgCell.setAttr('title', cm.message);
             row.createEl('td', { text: global.wordsAdded.toString() });
             row.createEl('td', { text: global.wordsDeleted.toString() });
             row.createEl('td', { text: global.revisionWords.toString() });
@@ -294,38 +307,41 @@ export class ProgressView extends ItemView {
     private renderDaily(container: HTMLElement) {
         const allCommits = this.plugin.metricsStore.getAllMetrics();
         if (allCommits.length === 0) {
-            container.createEl('p', { text: 'Keine Commits analysiert.' });
+            container.createEl('p', { text: 'No commits analyzed.' });
             return;
         }
-        const dailyMap = new Map<string, { added: number; deleted: number; revisionWords: number; revisionNet: number }>();
+
+        const dailyMap = new Map<string, { added: number; deleted: number; revisionWords: number; revisionNet: number; displayDate: string }>();
         for (const cm of allCommits) {
             const global = cm.files['__global__'];
             if (!global) continue;
-            const dateKey = new Date(cm.timestamp * 1000).toLocaleDateString();
-            const entry = dailyMap.get(dateKey) || { added: 0, deleted: 0, revisionWords: 0, revisionNet: 0 };
+            const date = new Date(cm.timestamp * 1000);
+            const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            const entry = dailyMap.get(dateKey) || { added: 0, deleted: 0, revisionWords: 0, revisionNet: 0, displayDate: date.toLocaleDateString() };
             entry.added += global.wordsAdded;
             entry.deleted += global.wordsDeleted;
             entry.revisionWords += global.revisionWords;
             entry.revisionNet += global.revisionNetWords;
             dailyMap.set(dateKey, entry);
         }
+
         const sortedDays = Array.from(dailyMap.entries()).sort((a, b) => b[0].localeCompare(a[0]));
 
-        container.createEl('h4', { text: 'Tägliche Zusammenfassung' });
-        const table = container.createEl('table');
+        container.createEl('h4', { text: 'Daily Summary' });
+        const table = container.createEl('table', { cls: 'GitProgressTracker-data-table' });
         const header = table.createEl('tr');
-        header.createEl('th', { text: 'Datum' });
-        header.createEl('th', { text: '+ Wörter' });
-        header.createEl('th', { text: '- Wörter' });
-        header.createEl('th', { text: 'Überarb.' });
-        header.createEl('th', { text: 'Netto' });
-        header.createEl('th', { text: 'Arbeitsvol.' });
+        header.createEl('th', { text: 'Date' });
+        header.createEl('th', { text: '+ Words' });
+        header.createEl('th', { text: '- Words' });
+        header.createEl('th', { text: 'Revisions' });
+        header.createEl('th', { text: 'Net' });
+        header.createEl('th', { text: 'Gross Work' });
 
-        for (const [date, vals] of sortedDays) {
+        for (const [dateKey, vals] of sortedDays) {
             const net = vals.added - vals.deleted + vals.revisionNet;
             const gross = vals.added + vals.deleted + vals.revisionWords;
             const row = table.createEl('tr');
-            row.createEl('td', { text: date });
+            row.createEl('td', { text: vals.displayDate });
             row.createEl('td', { text: vals.added.toString() });
             row.createEl('td', { text: vals.deleted.toString() });
             row.createEl('td', { text: vals.revisionWords.toString() });

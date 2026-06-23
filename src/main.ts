@@ -1,15 +1,15 @@
 import { Plugin, Notice, WorkspaceLeaf } from 'obsidian';
-import type { FederstrichSettings, CommitMetrics, AggregatedMetrics } from './types';
+import type { GitProgressTrackerSettings, CommitMetrics, AggregatedMetrics } from './types';
 import { DEFAULT_SETTINGS } from './types';
-import { FederstrichSettingTab } from './settings';
+import { GitProgressTrackerSettingTab } from './settings';
 import { GitAnalyzer } from './GitAnalyzer';
 import { DiffParser } from './DiffParser';
 import { WordCounter } from './WordCounter';
 import { MetricsStore } from './MetricsStore';
-import { ProgressView, VIEW_TYPE_FEDERSTRICH } from './ProgressView';
+import { ProgressView, VIEW_TYPE_GitProgressTracker } from './ProgressView';
 
-export default class FederstrichPlugin extends Plugin {
-    settings!: FederstrichSettings;
+export default class GitProgressTrackerPlugin extends Plugin {
+    settings!: GitProgressTrackerSettings;
     gitAnalyzer!: GitAnalyzer;
     metricsStore!: MetricsStore;         // public, damit die View darauf zugreifen kann
     private lastAggregated: AggregatedMetrics | null = null;
@@ -25,32 +25,33 @@ export default class FederstrichPlugin extends Plugin {
 
         this.gitAnalyzer = new GitAnalyzer(vaultRoot, this.settings);
 
-        this.addSettingTab(new FederstrichSettingTab(this.app, this));
+        this.addSettingTab(new GitProgressTrackerSettingTab(this.app, this));
 
         this.registerView(
-            VIEW_TYPE_FEDERSTRICH,
+            VIEW_TYPE_GitProgressTracker,
             (leaf) => new ProgressView(leaf, this)
         );
 
-        this.addRibbonIcon('feather', 'Federstrich Fortschritt', () => {
+        this.addRibbonIcon('feather', 'GitProgressTracker Progress', async () => {
+            await this.updateProgress();
             this.activateView();
         });
 
         this.addCommand({
-            id: 'federstrich-update-progress',
-            name: 'Fortschritt aktualisieren',
+            id: 'GitProgressTracker-update-progress',
+            name: 'Update progress',
             callback: () => this.updateProgress()
         });
 
         this.addCommand({
-            id: 'federstrich-show-view',
-            name: 'Fortschrittsansicht öffnen',
+            id: 'GitProgressTracker-show-view',
+            name: 'Show progress view',
             callback: () => this.activateView()
         });
 
         this.addCommand({
-            id: 'federstrich-reset-cache',
-            name: 'Cache leeren & alles neu analysieren',
+            id: 'GitProgressTracker-reset-cache',
+            name: 'Clear cache & re-analyze everything',
             callback: () => this.resetAndUpdate()
         });
     }
@@ -63,7 +64,7 @@ export default class FederstrichPlugin extends Plugin {
     }
 
     async updateProgress() {
-        const notice = new Notice('Analysiere Git-Commits...');
+        const notice = new Notice('Analyze Git commits...');
         try {
             const lastCommit = this.metricsStore.getAllMetrics()?.[0];
             let since: Date | undefined = undefined;
@@ -72,7 +73,7 @@ export default class FederstrichPlugin extends Plugin {
             }
             const commits = await this.gitAnalyzer.getCommits(since);
             if (commits.length === 0) {
-                notice.setMessage('Keine neuen Commits gefunden.');
+                notice.setMessage('No new commits found.');
                 return;
             }
 
@@ -114,7 +115,7 @@ export default class FederstrichPlugin extends Plugin {
                                 revisions++;
                                 const oldTokens = wordCounter.tokenizeLines(block.oldLines);
                                 const newTokens = wordCounter.tokenizeLines(block.newLines);
-                                revisionWords += FederstrichPlugin.calculateRevisionWords(oldTokens, newTokens);
+                                revisionWords += GitProgressTrackerPlugin.calculateRevisionWords(oldTokens, newTokens);
                                 revisionNetWords += newTokens.length - oldTokens.length;
                                 break;
                         }
@@ -132,7 +133,7 @@ export default class FederstrichPlugin extends Plugin {
                     this.metricsStore.addMetrics(metrics);
                     processed++;
                 } catch (commitError) {
-                    console.error(`Federstrich: Fehler bei Commit ${commit.hash}`, commitError);
+                    console.error(`GitProgressTracker: Error with commit ${commit.hash}`, commitError);
                     errors++;
                 }
             }
@@ -142,12 +143,12 @@ export default class FederstrichPlugin extends Plugin {
             this.updateView();
 
             notice.setMessage(
-                `${processed} Commits analysiert` +
-                (errors > 0 ? `, ${errors} Fehler (siehe Konsole)` : '')
+                `${processed} Commits analysed` +
+                (errors > 0 ? `, ${errors} errors (see console)` : '')
             );
         } catch (e) {
-            console.error('Federstrich update error', e);
-            notice.setMessage('Fehler bei der Analyse. Details in der Konsole.');
+            console.error('GitProgressTracker update error', e);
+            notice.setMessage('Error during analysis. Details in the console.');
         }
     }
 
@@ -224,13 +225,13 @@ export default class FederstrichPlugin extends Plugin {
     async activateView() {
         const { workspace } = this.app;
         let leaf: WorkspaceLeaf | null =
-            workspace.getLeavesOfType(VIEW_TYPE_FEDERSTRICH)[0] ?? null;
+            workspace.getLeavesOfType(VIEW_TYPE_GitProgressTracker)[0] ?? null;
 
         if (!leaf) {
             leaf = workspace.getRightLeaf(false);
             if (!leaf) return;
             await leaf.setViewState({
-                type: VIEW_TYPE_FEDERSTRICH,
+                type: VIEW_TYPE_GitProgressTracker,
                 active: true
             });
         }
@@ -239,7 +240,7 @@ export default class FederstrichPlugin extends Plugin {
     }
 
     updateView() {
-        const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_FEDERSTRICH);
+        const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_GitProgressTracker);
         for (const leaf of leaves) {
             if (leaf.view instanceof ProgressView) {
                 leaf.view.render();

@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import type { FederstrichSettings } from './types';
+import type { GitProgressTrackerSettings } from './types';
 
 const execAsync = promisify(exec);
 
@@ -12,9 +12,9 @@ export interface GitCommit {
 
 export class GitAnalyzer {
     private repoPath: string;
-    private settings: FederstrichSettings;
+    private settings: GitProgressTrackerSettings;
 
-    constructor(vaultRoot: string, settings: FederstrichSettings) {
+    constructor(vaultRoot: string, settings: GitProgressTrackerSettings) {
         this.repoPath = settings.repoPath ? `${vaultRoot}/${settings.repoPath}` : vaultRoot;
         this.settings = settings;
     }

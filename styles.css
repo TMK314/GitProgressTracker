@@ -1,18 +1,42 @@
-.federstrich-tabs {
-    margin-bottom: 10px;
+/* Tabs */
+.GitProgressTracker-tabs {
+    display: flex;
+    position: relative;
+    margin-bottom: 15px;
 }
-.federstrich-tab-btn {
-    margin-right: 5px;
-    padding: 4px 10px;
-    cursor: pointer;
-    background: var(--background-secondary);
-    border: 1px solid var(--background-modifier-border);
-    border-radius: 4px;
-}
-.federstrich-tab-btn.active {
+.GitProgressTracker-tabs::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
     background: var(--interactive-accent);
-    color: white;
+    z-index: 1;
 }
+.GitProgressTracker-tab-btn {
+    background: transparent !important;   /* erzwingt Transparenz */
+    border: none !important;
+    box-shadow: none !important;
+    padding: 8px 16px;
+    margin-right: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    position: relative;
+    z-index: 2;                             /* über ::after, damit eigene border-bottom sichtbar */
+}
+.GitProgressTracker-tab-btn:hover {
+    color: var(--text-normal);
+}
+.GitProgressTracker-tab-btn.active {
+    color: var(--interactive-accent);
+    border-bottom-color: var(--interactive-accent);
+    font-weight: 500;
+}
+
 .commit-hash {
     font-family: monospace;
     color: var(--text-muted);
@@ -21,88 +45,42 @@
     color: var(--text-normal);
 }
 
-.federstrich-tabs {
+/* Heatmap */
+.heatmap-controls {
     margin-bottom: 10px;
 }
-.federstrich-tab-btn {
-    margin-right: 5px;
+.GitProgressTracker-btn {
     padding: 4px 10px;
     cursor: pointer;
     background: var(--background-secondary);
     border: 1px solid var(--background-modifier-border);
     border-radius: 4px;
 }
-.federstrich-tab-btn.active {
-    background: var(--interactive-accent);
-    color: white;
-}
-.commit-hash {
-    font-family: monospace;
-    color: var(--text-muted);
-}
-.commit-msg {
-    color: var(--text-normal);
+.GitProgressTracker-btn:hover {
+    background: var(--background-modifier-hover);
 }
 
-.federstrich-tabs {
-    margin-bottom: 10px;
-}
-.federstrich-tab-btn {
-    margin-right: 5px;
-    padding: 4px 10px;
-    cursor: pointer;
-    background: var(--background-secondary);
-    border: 1px solid var(--background-modifier-border);
-    border-radius: 4px;
-}
-.federstrich-tab-btn.active {
-    background: var(--interactive-accent);
-    color: white;
-}
-.commit-hash {
-    font-family: monospace;
-    color: var(--text-muted);
-}
-.commit-msg {
-    color: var(--text-normal);
-}
-
-.federstrich-tabs {
-    margin-bottom: 10px;
-}
-.federstrich-tab-btn {
-    margin-right: 5px;
-    padding: 4px 10px;
-    cursor: pointer;
-    background: var(--background-secondary);
-    border: 1px solid var(--background-modifier-border);
-    border-radius: 4px;
-}
-.federstrich-tab-btn.active {
-    background: var(--interactive-accent);
-    color: white;
-}
-.commit-hash {
-    font-family: monospace;
-    color: var(--text-muted);
-}
-.commit-msg {
-    color: var(--text-normal);
-}
-
-
-
-.federstrich-heatmap {
+.GitProgressTracker-heatmap {
     margin-bottom: 20px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
 
 .heatmap-table {
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 7px;
     font-size: 10px;
     line-height: 1;
     white-space: nowrap;
+    width: max-content;
+    min-width: 100%;
+}
+
+/* Gedrehte Ansicht: nicht auf 100% strecken */
+.heatmap-table.rotated {
+    min-width: unset;
+    width: max-content;
+    table-layout: auto;
 }
 
 .heatmap-month-header,
@@ -115,12 +93,26 @@
     color: var(--text-muted);
 }
 
+.heatmap-day-header {
+    width: 14px;
+    min-width: 14px;
+    max-width: 14px;
+}
+
+.heatmap-month-cell {
+    width: 50px;
+    min-width: 50px;
+    max-width: 50px;
+    white-space: nowrap;
+}
+
 .heatmap-cell {
     width: 14px;
     height: 14px;
+    min-width: 14px;
+    max-width: 14px;
     border-radius: 50%;
     border: none;
-    margin: 3px;
     position: relative;
 }
 
@@ -130,3 +122,41 @@
 
 .theme-light .heatmap-cell.empty { background: #ebedf0; }
 .theme-dark .heatmap-cell.empty { background: #2d333b; }
+
+
+/* Daten-Tabellen (Commit- und Tagesansicht) */
+.GitProgressTracker-data-table {
+    border-collapse: separate;
+    border-spacing: 10px 4px;
+    width: 100%;
+    table-layout: auto;
+}
+.GitProgressTracker-data-table th,
+.GitProgressTracker-data-table td {
+    padding: 2px 4px;
+    text-align: center;
+    vertical-align: middle;
+}
+.GitProgressTracker-data-table th {
+    color: var(--text-muted);
+    font-weight: bold;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+/* Erste Spalte (Datum) linksbündig */
+.GitProgressTracker-data-table td:first-child,
+.GitProgressTracker-data-table th:first-child {
+    text-align: left;
+}
+/* Commit-Nachrichtenzelle */
+.commit-msg-cell {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left !important;   /* Nachricht linksbündig */
+}
+/* Hash-Spalte in Commits */
+.GitProgressTracker-data-table .commit-hash {
+    font-family: monospace;
+    color: var(--text-muted);
+}

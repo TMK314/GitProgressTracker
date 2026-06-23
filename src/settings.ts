@@ -1,10 +1,10 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
-import type FederstrichPlugin from './main';
+import type GitProgressTrackerPlugin from './main';
 
-export class FederstrichSettingTab extends PluginSettingTab {
-    plugin: FederstrichPlugin;
+export class GitProgressTrackerSettingTab extends PluginSettingTab {
+    plugin: GitProgressTrackerPlugin;
 
-    constructor(app: App, plugin: FederstrichPlugin) {
+    constructor(app: App, plugin: GitProgressTrackerPlugin) {
         super(app, plugin);
         this.plugin = plugin;
     }
@@ -12,11 +12,11 @@ export class FederstrichSettingTab extends PluginSettingTab {
     display(): void {
         const { containerEl } = this;
         containerEl.empty();
-        containerEl.createEl('h2', { text: 'Federstrich Einstellungen' });
+        containerEl.createEl('h2', { text: 'GitProgressTracker Settings' });
 
         new Setting(containerEl)
-            .setName('Repository-Pfad')
-            .setDesc('Relativer Pfad innerhalb des Vaults, der das Git-Repo enthält. Leer = Vault-Root.')
+            .setName('Repository-Path')
+            .setDesc('Relative Path inside the Vaults that contains the Git-Repo. Leave empty for Vault-Root.')
             .addText(text => text
                 .setPlaceholder('/')
                 .setValue(this.plugin.settings.repoPath)
@@ -26,8 +26,8 @@ export class FederstrichSettingTab extends PluginSettingTab {
                 }));
 
         new Setting(containerEl)
-            .setName('Autor-Filter')
-            .setDesc('Nur Commits dieses Autors berücksichtigen. Leer lassen für alle.')
+            .setName('Author-Filter')
+            .setDesc('Only consider commits by this author. Leave empty for all.')
             .addText(text => text
                 .setValue(this.plugin.settings.authorFilter)
                 .onChange(async (value) => {
@@ -36,8 +36,8 @@ export class FederstrichSettingTab extends PluginSettingTab {
                 }));
 
         new Setting(containerEl)
-            .setName('Dateien einschließen (Glob)')
-            .setDesc('Nur Dateien, die diesem Glob-Muster entsprechen, werden analysiert. Standard: **/*.md')
+            .setName('Include Files (Glob)')
+            .setDesc('Only consider files that match this glob pattern. Default: **/*.md')
             .addText(text => text
                 .setPlaceholder('**/*.md')
                 .setValue(this.plugin.settings.includePattern)
@@ -47,8 +47,8 @@ export class FederstrichSettingTab extends PluginSettingTab {
                 }));
 
         new Setting(containerEl)
-            .setName('Wort-Trennzeichen (Regex)')
-            .setDesc('Regulärer Ausdruck, um Wörter zu trennen.')
+            .setName('Word Separator (Regex)')
+            .setDesc('Regular expression to split words.')
             .addText(text => text
                 .setValue(this.plugin.settings.wordSeparatorRegex)
                 .onChange(async (value) => {
@@ -57,8 +57,8 @@ export class FederstrichSettingTab extends PluginSettingTab {
                 }));
 
         new Setting(containerEl)
-            .setName('Max. Kontextzeilen für Überarbeitung')
-            .setDesc('Wieviele Kontextzeilen zwischen Löschung und Einfügung liegen dürfen, um noch als Überarbeitung (Revision) zu gelten.')
+            .setName('Max. context lines for revision')
+            .setDesc('How many lines of context are permitted between a deletion and an insertion for it to still count as a revision.')
             .addSlider(slider => slider
                 .setLimits(0, 5, 1)
                 .setValue(this.plugin.settings.maxRevisionDistance)
@@ -68,10 +68,10 @@ export class FederstrichSettingTab extends PluginSettingTab {
                 }));
 
         // Gewichtungen
-        containerEl.createEl('h3', { text: 'Gewichtungen für Fortschrittsindex' });
+        containerEl.createEl('h3', { text: 'Progress Index Weights' });
 
         new Setting(containerEl)
-            .setName('Gewichtung: Neue Wörter')
+            .setName('Weight: New Words')
             .addSlider(slider => slider
                 .setLimits(0, 2, 0.1)
                 .setValue(this.plugin.settings.writingIndexWeights.addition)
@@ -82,7 +82,7 @@ export class FederstrichSettingTab extends PluginSettingTab {
                 }));
 
         new Setting(containerEl)
-            .setName('Gewichtung: Gelöschte Wörter')
+            .setName('Weight: Deleted Words')
             .addSlider(slider => slider
                 .setLimits(0, 2, 0.1)
                 .setValue(this.plugin.settings.writingIndexWeights.deletion)
@@ -93,7 +93,7 @@ export class FederstrichSettingTab extends PluginSettingTab {
                 }));
 
         new Setting(containerEl)
-            .setName('Gewichtung: Überarbeitete Wörter')
+            .setName('Weight: Revised Words')
             .addSlider(slider => slider
                 .setLimits(0, 2, 0.1)
                 .setValue(this.plugin.settings.writingIndexWeights.revision)
@@ -104,8 +104,8 @@ export class FederstrichSettingTab extends PluginSettingTab {
                 }));
 
         new Setting(containerEl)
-            .setName('Tägliches Ziel (gewichtete Einheiten)')
-            .setDesc('Ziel für den gewichteten Fortschrittsindex pro Tag (z. B. 500).')
+            .setName('Daily Goal (Weighted Units)')
+            .setDesc('Target for the weighted progress index per day (e.g., 500).')
             .addText(text => text
                 .setValue(this.plugin.settings.dailyGoal.toString())
                 .onChange(async (value) => {

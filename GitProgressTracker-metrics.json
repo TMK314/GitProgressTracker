@@ -1,0 +1,82 @@
+[
+  {
+    "hash": "d132f08d59a7965bbcf892d3e68cb01cc10a94e0",
+    "timestamp": 1782235068,
+    "message": "1 Wort geändert, 1 Wort gelöscht",
+    "files": {
+      "__global__": {
+        "additions": 0,
+        "deletions": 0,
+        "revisions": 1,
+        "wordsAdded": 0,
+        "wordsDeleted": 0,
+        "revisionWords": 2,
+        "revisionNetWords": -1
+      }
+    }
+  },
+  {
+    "hash": "69fdc3de94cfba7cfc424b3501f09e78b7af750f",
+    "timestamp": 1782227046,
+    "message": "Willkommen - 1 Wort geändert, 1 Wort gelöscht.",
+    "files": {
+      "__global__": {
+        "additions": 0,
+        "deletions": 0,
+        "revisions": 1,
+        "wordsAdded": 0,
+        "wordsDeleted": 0,
+        "revisionWords": 2,
+        "revisionNetWords": -1
+      }
+    }
+  },
+  {
+    "hash": "9d143ee2e82eb6c4959ab39de79093914825c9ed",
+    "timestamp": 1782224935,
+    "message": "Willkommen - 5 Worte gelöscht",
+    "files": {
+      "__global__": {
+        "additions": 0,
+        "deletions": 2,
+        "revisions": 0,
+        "wordsAdded": 0,
+        "wordsDeleted": 5,
+        "revisionWords": 0,
+        "revisionNetWords": 0
+      }
+    }
+  },
+  {
+    "hash": "25911f48425d0ef6734f9a3d669ad8822b1ad109",
+    "timestamp": 1782224810,
+    "message": "Wilkommen - 3 Worte geändert",
+    "files": {
+      "__global__": {
+        "additions": 0,
+        "deletions": 0,
+        "revisions": 1,
+        "wordsAdded": 0,
+        "wordsDeleted": 0,
+        "revisionWords": 2,
+        "revisionNetWords": 0
+      }
+    }
+  },
+  {
+    "hash": "c65a0e5d0a36711b57526fe2032cd4b37c7cfa75",
+    "timestamp": 1782224371,
+    "message": "Initial commit",
+    "files": {
+      "__global__": {
+        "additions": 5,
+        "deletions": 0,
+        "revisions": 0,
+        "wordsAdded": 38,
+        "wordsDeleted": 0,
+        "revisionWords": 0,
+        "revisionNetWords": 0
+      }
+    }
+  }
+]
