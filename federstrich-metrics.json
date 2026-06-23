@@ -1,5 +1,21 @@
 [
   {
+    "hash": "69fdc3de94cfba7cfc424b3501f09e78b7af750f",
+    "timestamp": 1782227046,
+    "message": "Willkommen - 1 Wort geändert, 1 Wort gelöscht.",
+    "files": {
+      "__global__": {
+        "additions": 0,
+        "deletions": 0,
+        "revisions": 1,
+        "wordsAdded": 0,
+        "wordsDeleted": 0,
+        "revisionWords": 2,
+        "revisionNetWords": -1
+      }
+    }
+  },
+  {
     "hash": "9d143ee2e82eb6c4959ab39de79093914825c9ed",
     "timestamp": 1782224935,
     "message": "Willkommen - 5 Worte gelöscht",
@@ -10,8 +26,8 @@
         "revisions": 0,
         "wordsAdded": 0,
         "wordsDeleted": 5,
-        "wordsOldRevised": 0,
-        "wordsNewRevised": 0
+        "revisionWords": 0,
+        "revisionNetWords": 0
       }
     }
   },
@@ -26,8 +42,8 @@
         "revisions": 1,
         "wordsAdded": 0,
         "wordsDeleted": 0,
-        "wordsOldRevised": 19,
-        "wordsNewRevised": 19
+        "revisionWords": 2,
+        "revisionNetWords": 0
       }
     }
   },
@@ -42,8 +58,8 @@
         "revisions": 0,
         "wordsAdded": 43,
         "wordsDeleted": 0,
-        "wordsOldRevised": 0,
-        "wordsNewRevised": 0
+        "revisionWords": 0,
+        "revisionNetWords": 0
       }
     }
   }

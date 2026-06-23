@@ -13,55 +13,34 @@ export class ProgressView extends ItemView {
         this.plugin = plugin;
     }
 
-    getViewType(): string {
-        return VIEW_TYPE_FEDERSTRICH;
-    }
+    getViewType(): string { return VIEW_TYPE_FEDERSTRICH; }
+    getDisplayText(): string { return 'Federstrich Fortschritt'; }
+    getIcon(): string { return 'feather'; }
 
-    getDisplayText(): string {
-        return 'Federstrich Fortschritt';
-    }
-
-    getIcon(): string {
-        return 'feather';
-    }
-
-    async onOpen(): Promise<void> {
-        this.render();
-    }
+    async onOpen(): Promise<void> { this.render(); }
 
     render(): void {
         const contentEl = this.containerEl.children[1];
         if (!contentEl) return;
         contentEl.empty();
 
-        // Tab-Leiste
         const tabBar = contentEl.createEl('div', { cls: 'federstrich-tabs' });
         this.createTabButton(tabBar, 'Übersicht', 'overview');
         this.createTabButton(tabBar, 'Nach Commit', 'commits');
         this.createTabButton(tabBar, 'Nach Tag', 'daily');
 
-        // Inhalt
         const tabContent = contentEl.createEl('div', { cls: 'federstrich-tab-content' });
         switch (this.activeTab) {
-            case 'overview':
-                this.renderOverview(tabContent);
-                break;
-            case 'commits':
-                this.renderCommits(tabContent);
-                break;
-            case 'daily':
-                this.renderDaily(tabContent);
-                break;
+            case 'overview': this.renderOverview(tabContent); break;
+            case 'commits': this.renderCommits(tabContent); break;
+            case 'daily': this.renderDaily(tabContent); break;
         }
     }
 
     private createTabButton(parent: HTMLElement, label: string, tab: 'overview' | 'commits' | 'daily') {
         const btn = parent.createEl('button', { text: label, cls: 'federstrich-tab-btn' });
         if (this.activeTab === tab) btn.addClass('active');
-        btn.onclick = () => {
-            this.activeTab = tab;
-            this.render();
-        };
+        btn.onclick = () => { this.activeTab = tab; this.render(); };
     }
 
     private renderOverview(container: HTMLElement) {
@@ -75,11 +54,10 @@ export class ProgressView extends ItemView {
         const rows: [string, number][] = [
             ['Netto-Wortdifferenz', metrics.netWords],
             ['Brutto-Arbeitsvolumen', metrics.grossWork],
-            ['Reine Überarbeitung', metrics.pureRevision],
-            ['Neue Wörter (reine Addition)', metrics.totalWordsAdded],
-            ['Gelöschte Wörter (reine Löschung)', metrics.totalWordsDeleted],
-            ['Alte Wörter (überarbeitet)', metrics.totalWordsOldRevised],
-            ['Neue Wörter (überarbeitet)', metrics.totalWordsNewRevised]
+            ['Reine Überarbeitung (bearbeitete Wörter)', metrics.pureRevision],
+            ['Neue Wörter (Additionen)', metrics.totalWordsAdded],
+            ['Gelöschte Wörter (Löschungen)', metrics.totalWordsDeleted],
+            ['Überarbeitung Netto-Änderung', metrics.totalRevisionNetWords]
         ];
         for (const [label, value] of rows) {
             const row = table.createEl('tr');
@@ -102,11 +80,13 @@ export class ProgressView extends ItemView {
         header.createEl('th', { text: '+ Wörter' });
         header.createEl('th', { text: '- Wörter' });
         header.createEl('th', { text: 'Überarb.' });
+        header.createEl('th', { text: 'Netto' });
 
         for (const cm of allCommits) {
             const global = cm.files['__global__'];
             if (!global) continue;
             const date = new Date(cm.timestamp * 1000).toLocaleDateString();
+            const net = global.wordsAdded - global.wordsDeleted + global.revisionNetWords;
             const row = table.createEl('tr');
             row.createEl('td', { text: date });
             const hashCell = row.createEl('td');
@@ -114,7 +94,8 @@ export class ProgressView extends ItemView {
             hashCell.createEl('span', { text: ` ${cm.message}`, cls: 'commit-msg' });
             row.createEl('td', { text: global.wordsAdded.toString() });
             row.createEl('td', { text: global.wordsDeleted.toString() });
-            row.createEl('td', { text: (global.wordsOldRevised + global.wordsNewRevised).toString() });
+            row.createEl('td', { text: global.revisionWords.toString() });
+            row.createEl('td', { text: net.toString() });
         }
     }
 
@@ -124,39 +105,38 @@ export class ProgressView extends ItemView {
             container.createEl('p', { text: 'Keine Commits analysiert.' });
             return;
         }
-        // Nach Tag gruppieren
-        const dailyMap = new Map<string, { added: number; deleted: number; revised: number }>();
+        const dailyMap = new Map<string, { added: number; deleted: number; revisionWords: number; revisionNet: number }>();
         for (const cm of allCommits) {
             const global = cm.files['__global__'];
             if (!global) continue;
             const dateKey = new Date(cm.timestamp * 1000).toLocaleDateString();
-            const entry = dailyMap.get(dateKey) || { added: 0, deleted: 0, revised: 0 };
+            const entry = dailyMap.get(dateKey) || { added: 0, deleted: 0, revisionWords: 0, revisionNet: 0 };
             entry.added += global.wordsAdded;
             entry.deleted += global.wordsDeleted;
-            entry.revised += global.wordsOldRevised + global.wordsNewRevised;
+            entry.revisionWords += global.revisionWords;
+            entry.revisionNet += global.revisionNetWords;
             dailyMap.set(dateKey, entry);
         }
-        // Sortierte Tage (neueste zuerst)
         const sortedDays = Array.from(dailyMap.entries()).sort((a, b) => b[0].localeCompare(a[0]));
 
         container.createEl('h4', { text: 'Tägliche Zusammenfassung' });
         const table = container.createEl('table');
         const header = table.createEl('tr');
         header.createEl('th', { text: 'Datum' });
-        header.createEl('th', { text: 'Neue Wörter' });
-        header.createEl('th', { text: 'Gelöschte Wörter' });
-        header.createEl('th', { text: 'Überarbeitung' });
+        header.createEl('th', { text: '+ Wörter' });
+        header.createEl('th', { text: '- Wörter' });
+        header.createEl('th', { text: 'Überarb.' });
         header.createEl('th', { text: 'Netto' });
-        header.createEl('th', { text: 'Arbeitsvolumen' });
+        header.createEl('th', { text: 'Arbeitsvol.' });
 
         for (const [date, vals] of sortedDays) {
-            const net = vals.added - vals.deleted;
-            const gross = vals.added + vals.deleted + vals.revised;
+            const net = vals.added - vals.deleted + vals.revisionNet;
+            const gross = vals.added + vals.deleted + vals.revisionWords;
             const row = table.createEl('tr');
             row.createEl('td', { text: date });
             row.createEl('td', { text: vals.added.toString() });
             row.createEl('td', { text: vals.deleted.toString() });
-            row.createEl('td', { text: vals.revised.toString() });
+            row.createEl('td', { text: vals.revisionWords.toString() });
             row.createEl('td', { text: net.toString() });
             row.createEl('td', { text: gross.toString() });
         }
