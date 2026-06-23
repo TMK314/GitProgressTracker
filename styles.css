@@ -1,8 +1,22 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+.federstrich-tabs {
+    margin-bottom: 10px;
+}
+.federstrich-tab-btn {
+    margin-right: 5px;
+    padding: 4px 10px;
+    cursor: pointer;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+}
+.federstrich-tab-btn.active {
+    background: var(--interactive-accent);
+    color: white;
+}
+.commit-hash {
+    font-family: monospace;
+    color: var(--text-muted);
+}
+.commit-msg {
+    color: var(--text-normal);
+}

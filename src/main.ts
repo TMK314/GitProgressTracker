@@ -45,6 +45,12 @@ export default class FederstrichPlugin extends Plugin {
             name: 'Fortschrittsansicht öffnen',
             callback: () => this.activateView()
         });
+
+        this.addCommand({
+            id: 'federstrich-reset-cache',
+            name: 'Cache leeren & alles neu analysieren',
+            callback: () => this.resetAndUpdate()
+        });
     }
 
     async updateProgress() {
@@ -139,6 +145,13 @@ export default class FederstrichPlugin extends Plugin {
             console.error('Federstrich update error', e);
             notice.setMessage('Fehler bei der Analyse. Details in der Konsole.');
         }
+    }
+
+    async resetAndUpdate() {
+        this.metricsStore.clear(); // siehe unten
+        await this.metricsStore.save();
+        this.lastAggregated = null;
+        await this.updateProgress();
     }
 
     computeAggregatedMetrics(): AggregatedMetrics {

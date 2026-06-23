@@ -46,4 +46,8 @@ export class MetricsStore {
     getAllMetrics(): CommitMetrics[] {
         return Array.from(this.data.values()).sort((a, b) => b.timestamp - a.timestamp);
     }
+
+    clear(): void {
+        this.data.clear();
+    }
 }
