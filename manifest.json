@@ -1,6 +1,6 @@
 {
 	"id": "git-revision-tracker",
-	"name": "Git Progress Tracker",
+	"name": "Git Revision Tracker",
 	"version": "1.0.0",
 	"minAppVersion": "1.0.0",
 	"description": "Tracks your Git progress.",
