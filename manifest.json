@@ -1,7 +1,7 @@
 {
 	"id": "git-revision-tracker",
 	"name": "Git Revision Tracker",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"minAppVersion": "1.12.7",
 	"description": "Tracks your Git progress.",
 	"author": "Theodor Kaiser",
