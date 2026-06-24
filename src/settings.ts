@@ -12,7 +12,7 @@ export class GitProgressTrackerSettingTab extends PluginSettingTab {
     display(): void {
         const { containerEl } = this;
         containerEl.empty();
-        containerEl.createEl('h2', { text: 'GitProgressTracker Settings' });
+        new Setting(containerEl).setName('GitProgressTracker Settings').setHeading();
 
         new Setting(containerEl)
             .setName('Repository-Path')
@@ -80,7 +80,7 @@ export class GitProgressTrackerSettingTab extends PluginSettingTab {
                 }));
 
         // Gewichtungen
-        containerEl.createEl('h3', { text: 'Progress Index Weights' });
+        new Setting(containerEl).setName('Progress Index Weights').setHeading();
 
         new Setting(containerEl)
             .setName('Weight: New Words')
