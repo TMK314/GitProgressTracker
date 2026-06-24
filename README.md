@@ -39,13 +39,13 @@ Track your writing progress across all phases of your project – from the first
 
 1. Open **Settings → Community Plugins**.
 2. Disable **Safe mode** if necessary.
-3. Click **Browse** and search for “Federstrich”.
+3. Click **Browse** and search for “Git Revision Tracker”.
 4. Install and enable the plugin.
 
 ### Manual installation
 
 1. Download the latest release from [GitHub Releases](https://github.com/TMK314/GitProgressTracker/releases).
-2. Extract the folder into `<vault>/.obsidian/plugins/federstrich/`.
+2. Extract the folder into `<vault>/.obsidian/plugins/git-revision-tracker/`.
 3. Reload Obsidian.
 4. Enable the plugin under **Settings → Community Plugins → Installed Plugins**.
 
