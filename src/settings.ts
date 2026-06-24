@@ -12,7 +12,7 @@ export class GitProgressTrackerSettingTab extends PluginSettingTab {
     display(): void {
         const { containerEl } = this;
         containerEl.empty();
-        new Setting(containerEl).setName('GitProgressTracker Settings').setHeading();
+        new Setting(containerEl).setName('GitProgressTracker').setHeading();
 
         new Setting(containerEl)
             .setName('Repository-Path')
