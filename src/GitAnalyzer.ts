@@ -20,7 +20,10 @@ export class GitAnalyzer {
     }
 
     private async runGit(args: string): Promise<string> {
-        const { stdout } = await execAsync(`git ${args}`, { cwd: this.repoPath });
+        const { stdout } = await execAsync(`git ${args}`, {
+        cwd: this.repoPath,
+        maxBuffer: 50 * 1024 * 1024  // 50 MB
+    });
         return stdout;
     }
 
