@@ -140,12 +140,28 @@ export function renderCodeFrequency(
     });
     svg.createSvg('line', { cls: 'codefreq-axis', attr: { x1: 0, x2: width - padRight, y1: zeroY, y2: zeroY } });
 
-    // Instant tooltip for the column under the cursor (native SVG <title> waits about a second)
+    attachTooltip({ svg, wrapper, hover, buckets, slot, top: padTop, perWeek });
+
+    window.requestAnimationFrame(() => { wrapper.scrollLeft = wrapper.scrollWidth; });
+}
+
+// Instant tooltip for the column under the cursor (native SVG <title> waits about a second).
+// `hover` is the highlight rect, drawn under the bars, that follows the cursor.
+function attachTooltip({ svg, wrapper, hover, buckets, slot, top, perWeek }: {
+    svg: SVGSVGElement;
+    wrapper: HTMLElement;
+    hover: SVGRectElement;
+    buckets: Bucket[];
+    slot: number;
+    top: number;
+    perWeek: boolean;
+}): void {
     const tooltip = wrapper.createEl('div', { cls: 'codefreq-tooltip' });
+    const hide = () => { svg.removeClass('is-hovering'); tooltip.hide(); };
     svg.addEventListener('mousemove', (e: MouseEvent) => {
         const i = Math.floor(e.offsetX / slot);
         const bucket = buckets[i];
-        if (!bucket) { svg.removeClass('is-hovering'); tooltip.hide(); return; }
+        if (!bucket) { hide(); return; }
         hover.setAttr('x', i * slot);
         svg.addClass('is-hovering');
         tooltip.empty();
@@ -157,10 +173,8 @@ export function renderCodeFrequency(
         const left = i * slot + slot + 8;
         const flip = left + tooltip.offsetWidth > wrapper.scrollLeft + wrapper.clientWidth;
         tooltip.style.left = `${flip ? i * slot - tooltip.offsetWidth - 8 : left}px`;
-        tooltip.style.top = `${padTop}px`;
+        tooltip.style.top = `${top}px`;
     });
-    svg.addEventListener('mouseleave', () => { svg.removeClass('is-hovering'); tooltip.hide(); });
+    svg.addEventListener('mouseleave', hide);
     tooltip.hide();
-
-    window.requestAnimationFrame(() => { wrapper.scrollLeft = wrapper.scrollWidth; });
 }
