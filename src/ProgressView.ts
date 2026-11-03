@@ -1,6 +1,7 @@
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import type GitProgressTrackerPlugin from './main';
 import type { AggregatedMetrics } from './types';
+import { renderCodeFrequency, type CodeFrequencyPeriod } from './CodeFrequencyChart';
 
 export const VIEW_TYPE_GitProgressTracker = 'GitProgressTracker-progress-view';
 
@@ -9,6 +10,8 @@ export class ProgressView extends ItemView {
     private activeTab: 'overview' | 'commits' | 'daily' = 'overview';
     private heatmapRotated: boolean = false;
     private heatmapDiv: HTMLElement | null = null;
+    private codeFreqPeriod: CodeFrequencyPeriod = 'week';
+    private codeFreqWidth = 0;
 
     constructor(leaf: WorkspaceLeaf, plugin: GitProgressTrackerPlugin) {
         super(leaf);
@@ -22,6 +25,10 @@ export class ProgressView extends ItemView {
         super.onResize();
         if (this.activeTab === 'overview' && this.heatmapDiv) {
             this.heatmapDiv.scrollLeft = this.heatmapDiv.scrollWidth;
+        }
+        // The code frequency chart is sized to the pane, so redraw when the width really changes
+        if (this.activeTab === 'daily' && Math.abs(this.contentEl.clientWidth - this.codeFreqWidth) > 40) {
+            this.render();
         }
     }
 
@@ -326,6 +333,12 @@ export class ProgressView extends ItemView {
         }
 
         const sortedDays = Array.from(dailyMap.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+
+        renderCodeFrequency(container, dailyMap, this.codeFreqPeriod, (period) => {
+            this.codeFreqPeriod = period;
+            this.render();
+        });
+        this.codeFreqWidth = this.contentEl.clientWidth;
 
         container.createEl('h4', { text: 'Daily Summary' });
         const table = container.createEl('table', { cls: 'GitProgressTracker-data-table' });
